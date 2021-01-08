@@ -2,24 +2,29 @@
 session_start();
 require './services/connect.php';
 if (isset($_POST['login'])) {
-  if (!empty($_POST['userName']) && !empty($_POST['password'])) {
-    $username = $_POST['userName'];
+
+
+
+  if (!empty($_POST['userEmail']) && !empty($_POST['password'])) {
+
+    $useremail = $_POST['userEmail'];
     $password = $_POST['password'];
     $password = md5($password);
-    $sql = "SELECT * from  admin where  userName='$username' and password ='$password' limit 0,1";
+
+    $sql = "SELECT * from  admin where  userEmail='$useremail' and password ='$password' limit 0,1";
     $res = $mysqli->query($sql);
 
     if ($res->num_rows > 0) {
       $row = $res->fetch_assoc();
-      $_SESSION['is_logged_in'] = true;
-      $_SESSION['uid'] = $row['id'];
-      $_SESSION['msg'] ="login successfully";
-      
+      $_SESSION["uid"] = $row['id'];
+      $_SESSION["is_logged_in"] = true;
+      header('Location:index.php');
     } else {
-      $_SESSION['msg'] = "invalid username and password";
+      $_SESSION['msg'] = "Invalid useremail and password";
     }
   }
 }
+
 
 $mysqli->close();
 
@@ -59,9 +64,9 @@ $mysqli->close();
               endif; ?>
 
 
-              <form class="pt-3" method="POST">
+              <form class="pt-3" action="" method="POST">
                 <div class="form-group">
-                  <input type="text" class="form-control form-control-lg" name="userName" placeholder="Username">
+                  <input type="Email" class="form-control form-control-lg" name="userEmail" placeholder="UserEmail">
                 </div>
                 <div class="form-group">
                   <input type="password" class="form-control form-control-lg" name="password" placeholder="Password">

@@ -1,0 +1,41 @@
+.apre
+{
+    margin-top:10px;
+}
+
+.pre
+{
+     color:#D689FF;
+     margin-top:
+     
+}
+.pre:hover
+{
+    color:#D689FF;
+    text-decoration:none;
+}
+#view-img
+{
+    
+    /* width:200px;
+    height:200px; */
+    /* margin:auto; */
+    
+}
+
+#view-img img
+{
+    object-fit: cover;
+    width:200px;
+    height:200px;
+    border-radius: 50%;
+    margin:auto;
+    display:block;
+    margin-bottom:46px;
+}
+.error img
+{
+    margin:auto;
+   display:block;
+   object-fit:cover;
+}

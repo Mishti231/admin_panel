@@ -5,4 +5,5 @@
 <!-- End layout styles -->
 <link rel="shortcut icon" href="assets/images/favicon.ico" />
 
-
+<!------mystyle--------->
+<link rel="stylesheet" href="assets/css/mystyle.css">

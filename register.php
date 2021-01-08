@@ -16,6 +16,7 @@ function redirect()
 
 if (isset($_POST['submit'])) {
 
+
   $name = $_POST['userName'];
   $email = $_POST['userEmail'];
   $country = $_POST['country'];
@@ -24,7 +25,10 @@ if (isset($_POST['submit'])) {
 
 
 
+
+
   //Data validation
+  //Name validation
   if ($name == "") {
     $_SESSION['msg'] = "Name field is required";
     redirect();
@@ -35,13 +39,30 @@ if (isset($_POST['submit'])) {
     redirect();
     exit;
   }
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $_SESSION['msg'] = "please enter valid email";
+
+  //email validation
+  if ($email == "") {
+    $_SESSION['msg'] = "Emailfield is required";
     redirect();
     exit;
   }
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['msg'] = "Please enter valid email";
+    redirect();
+    exit;
+  }
+  $sql = "SELECT userEmail FROM admin where userEmail='$email'";
+  $res = $mysqli->query($sql);
+  if ($res->num_rows > 0) {
+    //if $num_row is greater than 0, (means the email exists)
+    $_SESSION['msg'] = "Email already exits";
+    redirect();
+    exit;
+  }
+
+  //country validation
   if ($country == "null") {
-    $_SESSION['msg'] = "Please select an option from the select box.";
+    $_SESSION['msg'] = "Please select an option from country select box.";
     redirect();
     exit;
   }
@@ -51,11 +72,13 @@ if (isset($_POST['submit'])) {
    * one lowercase letter, one number and one special character:
    * 
    */
+  //password validation
   if (!preg_match("/^(?=.*[!@#$%^&*-])(?=.*[0-9])(?=.*[A-Z]).{8,20}$/", $password)) {
     $_SESSION['msg'] = "password does not fullfill the condition";
     redirect();
     exit;
   }
+  //term and conditon validation
   if (!isset($term_condition)) {
     $_SESSION['msg'] = "please cheked the term and condition";
     redirect();
@@ -70,14 +93,22 @@ if (isset($_POST['submit'])) {
 
 
   if ($name != "" and $email != "" and $country != "" and $password != "") {
+
     //insert data into database
     $res = "INSERT INTO admin (userName,userEmail,country,password)
-  VALUES ('$name','$email','$country','$password')";
+   VALUES ('$name','$email','$country','$password')";
     if (!$mysqli->query($res)) {
+
       $_SESSION['msg'] = "Error:could not able to insert data." . mysqli_error($mysqli);
       redirect();
       exit;
     }
+
+    //setting global data
+    if (!empty($name)) {
+      $_SESSION['name'] = $name;
+    }
+
     $to = "pbhaumik200@gmail.com"; //admin email
     $toUser = "$email"; //user email
 
@@ -88,15 +119,11 @@ if (isset($_POST['submit'])) {
     $message = "Please find the details below:
                       Name: " . $name . ";
                       Email:" . $email . ";
-                      Mobile:" . $mob . ";
-                      Date:" . $date . ";
-                      Course:" . $course . ";
-                      Gender:" . $gender . ";
-                      Address:" . $address . ";
-                      Additional_details:" . $additional_details;
+                      Country:" . $country;
 
 
-    $userMessage = "Thank you for submitted your query"; //user message           
+
+    $userMessage = "Thank you for registering with us"; //user message           
 
     // Instantiation and passing `true` enables exceptions
     $mail = new PHPMailer(true);
@@ -130,15 +157,17 @@ if (isset($_POST['submit'])) {
       $mail->Body    = $userMessage;
       $isUserMailSent = $mail->send();
 
-      $_SESSION['msg'] = "Query Submitted successfully";
+      $_SESSION['msg'] = "User registered successfully";
     } catch (Exception $e) {
-      $_SESSION['msg'] = "Error while submitting query";
+      $_SESSION['msg'] = "User registerd successfuly.(Unable to send email)";
+      redirect();
+      exit;
     }
-
-    header('Location:register.php');
   } else {
     $_SESSION['msg'] = "Error while submitting query";
-    header('Location:register.php');
+    redirect();
+    exit;
+    
   }
 }
 $mysqli->close();
@@ -179,7 +208,7 @@ $mysqli->close();
               </div>
               <h4>New here?</h4>
               <h6 class="font-weight-light">Signing up is easy. It only takes a few steps</h6>
-           
+
               <?php if (isset($_SESSION['msg'])) : ?>
                 <div class="alert alert-primary"><?= $_SESSION['msg']; ?></div>
               <?php unset($_SESSION['msg']);
